@@ -1,0 +1,88 @@
+/*
+  ------------------------------------------------------------------------------
+  © 2025 Javier Siliacay | USTP - All Rights Reserved.
+
+  This source code is the intellectual property of the author and is provided 
+  for educational and non-commercial use only. Unauthorized copying, modification, 
+  distribution, or use of this code for commercial purposes is strictly prohibited 
+  without prior written consent from the author.
+
+  Violation of these terms may result in legal action under applicable intellectual 
+  property laws.
+
+  For permissions, contact: siliacay.javier@ustp.edu.ph
+  ------------------------------------------------------------------------------
+*/
+
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+#define ONE_WIRE_BUS 2
+#define greenled 8
+#define redled 9
+#define buzzer 10
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+unsigned long lastReadTime = 0;
+const unsigned long refreshInterval = 100; // 100ms = 10 readings per second
+
+void setup() {
+  pinMode(greenled,OUTPUT);
+  pinMode(redled,OUTPUT);
+  pinMode(buzzer,OUTPUT);
+
+  Serial.begin(115200);
+  sensors.begin();
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("     Sensor");
+  lcd.setCursor(0, 1);
+  lcd.print("Initializing...");
+  delay(3000);
+  lcd.clear();
+}
+
+void loop() {
+  unsigned long currentTime = millis();
+  if (currentTime - lastReadTime >= refreshInterval) {
+    lastReadTime = currentTime;
+
+    sensors.requestTemperatures();
+    float tempC = sensors.getTempCByIndex(0);
+
+    // LCD Line 0: Title
+    lcd.setCursor(0, 0);
+    lcd.print("--Temperature-- ");
+
+    // LCD Line 1: Value
+    lcd.setCursor(0, 1);
+    lcd.print("Value: ");
+    lcd.print(tempC, 1); // 1 decimal place
+    lcd.print((char)223); // degree symbol
+    lcd.print("C    ");  // extra spaces to clear leftovers
+
+    Serial.print("Temp: ");
+    Serial.println(tempC, 1);
+    
+    if(tempC >= 38.0){ //When temperature rise up to 38 degrees celcius the Red Led will trigger together with buzzer
+       tone(buzzer,4000,1000);
+      digitalWrite(redled,HIGH);
+      delay(500);
+      digitalWrite(redled,LOW);
+      delay(500);
+      digitalWrite(greenled,LOW);     
+    }
+
+    else{
+      noTone(buzzer);
+      digitalWrite(greenled,HIGH);
+      digitalWrite(redled,LOW);
+    }
+  }
+}

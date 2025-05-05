@@ -1,0 +1,39 @@
+Project Workflow:
+
+Setup and Initialization:
+
+Initialize the required libraries: OneWire, DallasTemperature, and LiquidCrystal_I2C.
+
+Set up the hardware components: DS18B20 sensor, 16x2 LCD, red LED, green LED, and buzzer.
+
+Define the pins for the sensor and LEDs.
+
+Sensor Read and Display:
+
+In the loop, continuously read the temperature from the DS18B20 sensor.
+
+Calculate the temperature in Celsius and display it on the LCD.
+
+Send the temperature value to the serial monitor.
+
+Alert Mechanism:
+
+If the temperature exceeds 38°C, activate the red LED and trigger the buzzer with a 1-second tone.
+
+If the temperature is within the safe range, turn on the green LED and turn off the red LED and buzzer.
+
+Timing Control:
+
+The temperature is updated every 100 milliseconds (10 readings per second) to ensure real-time monitoring.
+
+Use the millis() function to manage the timing and ensure the temperature is read at the correct interval.
+
+Visual Feedback:
+
+The LCD constantly displays the temperature value.
+
+The green LED indicates normal conditions, while the red LED and buzzer indicate an alert.
+
+Final Output:
+
+The system will keep running, continuously updating the temperature display on the LCD and triggering alerts when necessary.
